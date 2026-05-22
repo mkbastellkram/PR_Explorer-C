@@ -1,0 +1,178 @@
+<!doctype html><html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>PR Explorer Madeira · Claude V1.7</title>
+<meta name="theme-color" content="#061616">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PR Explorer">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="./style-claude-v1.7.css">
+</head><body>
+<div id="app">
+  <div id="map"></div>
+  <div class="vignette"></div>
+
+  <!-- HERO -->
+  <header id="hero" class="hero">
+    <div><div class="kicker">MADEIRA</div><h1>PR Explorer</h1></div>
+    <div class="hero-actions">
+      <button id="viewBtn" class="hero-pill glass" aria-label="Ansicht">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      </button>
+      <div class="hero-pill-duo glass">
+        <button id="settingsBtn" aria-label="Einstellungen">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <div class="duo-sep"></div>
+        <button id="shareBtn" aria-label="Teilen" class="inactive-share">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW DROPDOWN -->
+  <div id="viewMenu" class="drop-menu glass hidden">
+    <div class="drop-row" id="locateBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <span>Aktueller Standort</span>
+    </div>
+    <div class="drop-row" id="fitAllBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      <span>Gesamte Route</span>
+    </div>
+    <div class="drop-row" id="fullscreenBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      <span>Vollbild-Ansicht</span>
+    </div>
+  </div>
+
+  <!-- FILTER MENU -->
+  <div id="filterMenu" class="drop-menu drop-right glass hidden">
+    <div class="drop-label">Region</div>
+    <div id="regionFilters" class="filterGrid"></div>
+    <div class="drop-label" style="margin-top:10px">Status</div>
+    <div id="statusFilters" class="statusDots"></div>
+    <button id="resetFilters" class="drop-reset">Filter zurücksetzen</button>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <section id="panel" class="panel glass hidden">
+    <div class="panelBar"></div>
+    <div id="panelContent"></div>
+  </section>
+
+  <!-- DETAIL PANEL -->
+  <section id="detailPanel" class="detailPanel glass hidden">
+    <button id="detailClose" class="miniClose">&#x2715;</button>
+    <div class="panelBar"></div>
+    <div id="detailContent"></div>
+  </section>
+
+  <!-- SETTINGS PANEL (full-screen, Geory-style) -->
+  <section id="settingsPanel" class="settingsPanel hidden">
+    <div class="settingsNav">
+      <button id="settingsClose" class="sNavClose">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <span class="sNavTitle">Einstellungen</span>
+      <div style="width:44px"></div>
+    </div>
+    <div id="settingsContent" class="settingsScroll"></div>
+  </section>
+
+  <!-- COLOR PICKER SHEET -->
+  <div id="colorSheet" class="sheet hidden">
+    <div class="sheetBar"></div>
+    <div class="sheetHead">
+      <button class="shClose" id="colorSheetClose">&#x2715;</button>
+      <span id="colorSheetTitle">Farbe wählen</span>
+      <button class="shConfirm" id="colorSheetSave">Sichern</button>
+    </div>
+    <div class="colorTabRow">
+      <button class="ctab active" data-tab="grid" onclick="setColorTab('grid')">Gitter</button>
+      <button class="ctab" data-tab="sliders" onclick="setColorTab('sliders')">Regler</button>
+    </div>
+    <div id="colorGrid" class="colorGrid"></div>
+    <div id="colorSliders" class="colorSliders hidden">
+      <div class="slRow"><span class="slLabel">ROT</span><input type="range" id="slR" min="0" max="255" oninput="sliderChanged()"><b id="slRv">200</b></div>
+      <div class="slRow"><span class="slLabel">GRÜN</span><input type="range" id="slG" min="0" max="255" oninput="sliderChanged()"><b id="slGv">100</b></div>
+      <div class="slRow"><span class="slLabel">BLAU</span><input type="range" id="slB" min="0" max="255" oninput="sliderChanged()"><b id="slBv">50</b></div>
+      <div class="hexRow">
+        <span>sRGB Hex #</span>
+        <input type="text" id="hexInput" maxlength="6" placeholder="FF6432" oninput="hexChanged()">
+      </div>
+    </div>
+    <div class="colorPreviewRow">
+      <div id="colorSwatch" class="colorSwatch"></div>
+      <span id="colorSwatchHex" style="font-size:15px;font-weight:700;color:#555"></span>
+    </div>
+  </div>
+
+  <!-- ICON PICKER SHEET -->
+  <div id="iconSheet" class="sheet hidden">
+    <div class="sheetBar"></div>
+    <div class="sheetHead">
+      <button class="shClose" id="iconSheetClose">&#x2715;</button>
+      <span>Icon wählen</span>
+      <button class="shConfirm" id="iconSheetSave">Sichern</button>
+    </div>
+    <div class="iconSearchRow">
+      <input type="text" id="iconSearchInput" placeholder="&#x1F50D; Icon-Name oder Stichwort" oninput="filterIcons(this.value)">
+    </div>
+    <div id="iconGrid" class="iconGrid"></div>
+  </div>
+
+  <!-- DATE PICKER SHEET -->
+  <div id="dateSheet" class="sheet hidden">
+    <div class="sheetBar"></div>
+    <div class="sheetHead">
+      <button class="shClose" id="dateSheetClose">&#x2715;</button>
+      <span>Reisezeitraum</span>
+      <button class="shConfirm" id="dateSheetSave">Sichern</button>
+    </div>
+    <div id="dateSub" class="dateSub"></div>
+    <div id="calWidget" class="calWidget"></div>
+  </div>
+
+  <!-- BACKDROP -->
+  <div id="backdrop" class="backdrop hidden"></div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottomNav" class="bottomNav glass">
+    <button data-tab="overview" class="active">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <b>Übersicht</b>
+    </button>
+    <button data-tab="journal">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <b>Journal</b>
+    </button>
+    <button data-tab="map">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      <b>Karte</b>
+    </button>
+    <button data-tab="trips">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <b>Reisen</b>
+    </button>
+    <button data-tab="options">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <b>Optionen</b>
+    </button>
+  </nav>
+
+  <button id="navOrb" class="navOrb hidden">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+  </button>
+  <button id="fullscreenClose" class="fullscreenClose glass hidden">&#x2715;</button>
+  <div id="toast"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="./pr-data.js"></script>
+<script src="./app-claude-v1.7.js"></script>
+</body></html>
