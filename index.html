@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>PR Explorer Madeira · Claude V1.8</title>
+<title>PR Explorer Madeira · Claude V2.0</title>
 <meta name="theme-color" content="#060f0d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="./style-claude-v1.8.css">
+<link rel="stylesheet" href="./style-claude-v2.0.css">
 </head>
 <body>
 <div id="app">
@@ -69,6 +69,8 @@
       <div id="regionFilters" class="chip-row"></div>
       <div class="fsec-label" style="margin-top:16px">Status</div>
       <div id="statusFilters" class="sf-chips"></div>
+      <div class="fsec-label" style="margin-top:18px">Distanzen & Belastung</div>
+      <div id="rangeFilters" class="range-filters"></div>
       <button id="resetFilters" class="reset-btn">Filter zurücksetzen</button>
     </div>
   </div>
@@ -200,6 +202,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="./pr-data.js"></script>
-<script src="./app-claude-v1.8.js"></script>
+<script src="./app-claude-v2.0.js"></script>
 </body>
 </html>
