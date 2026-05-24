@@ -652,6 +652,7 @@ function bind(){
   qs('#filterClose').onclick=()=>closeFilterSheet();
   qs('#resetFilters').onclick=()=>resetFilters();
   qs('#detailClose').onclick=closeDetail;
+  initDetailSwipe();
   qs('#settingsClose').onclick=closeSettings;
   map.on('click',()=>{ closeAllSheets();lgMarkers.eachLayer(m=>{const el=m.getElement();if(el)el.classList.remove('pin-sel');}); });
 }
