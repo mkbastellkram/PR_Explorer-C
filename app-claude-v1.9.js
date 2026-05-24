@@ -677,3 +677,287 @@ renderLayers();
 setTab('map');
 setTimeout(fitMadeira,300);
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+
+/* ══════════════════════════════════════════════════════════
+   TEST TAB — eingebaut in V1.9
+══════════════════════════════════════════════════════════ */
+const TEST_STEPS = [
+  { cat:'Karte & Navigation', steps:[
+    { id:'map-load',   icon:'🗺️', title:'App startet & Karte lädt',       sub:'Grundfunktion',
+      tap:'App öffnen – warte 2 Sekunden',
+      expect:'<b>Dunkle Karte</b> erscheint. "MADEIRA / PR Explorer" oben links. Teal-getönte Fußleiste unten.' },
+    { id:'map-pins',   icon:'📍', title:'PR-Pins erscheinen',              sub:'Label-Tags auf der Karte',
+      tap:'Warte nach dem Laden',
+      expect:'Farbige Tags (PR 1, PR 6.2 …) auf der Karte. <b>Grün = leicht, Orange = mittel, Rot = schwer.</b> Kleiner Dot oben rechts = Status.' },
+    { id:'map-zoom',   icon:'🔍', title:'Pins skalieren beim Zoomen',      sub:'Zoom-abhängige Größe',
+      tap:'Karte raus- und reinzoomen (Pinch)',
+      expect:'Pins werden beim Rauszoomen kleiner/transparenter, beim Reinzoomen größer.' },
+    { id:'map-locate', icon:'📡', title:'Standort-Button',                 sub:'Linke Pill oben – Pfeil-Icon',
+      tap:'Obere linke Pill → ersten Button (Pfeil) antippen',
+      expect:'Browser fragt Standortberechtigung. Nach Erlaubnis: Karte springt zu deinem Standort. Toast "Standort gefunden".' },
+    { id:'map-fit',    icon:'⬜', title:'Route einpassen',                 sub:'Mittlerer Button in der Pill',
+      tap:'Obere linke Pill → mittleren Button (Rechteck) antippen',
+      expect:'Karte fliegt sanft zurück und zeigt alle sichtbaren PRs.' },
+    { id:'map-fs',     icon:'⛶', title:'Vollbild ein & aus',              sub:'Rechter Button in der Pill',
+      tap:'Obere linke Pill → rechten Button (Pfeile) → dann × oben antippen',
+      expect:'Titel und Fußleiste verschwinden → nur Karte. × Button beendet Vollbild.' },
+  ]},
+  { cat:'Pin & Detail', steps:[
+    { id:'pin-tap',    icon:'👆', title:'Pin antippen öffnet Detail',      sub:'Label-Tag auf der Karte',
+      tap:'Einen PR-Tag antippen (z.B. PR 1)',
+      expect:'Karte fliegt zum PR. <b>Detail-Panel</b> öffnet von unten. Pin leuchtet mit blauem Glow.' },
+    { id:'detail-info',icon:'ℹ️', title:'Detail: Infos vollständig',       sub:'Alle Metadaten',
+      tap:'Detail-Panel lesen',
+      expect:'PR-Badge, Name, Region, km, Dauer, Anfahrt km+min, Höhenmeter. Ggf. ⚠️ "Kein Rundkurs".' },
+    { id:'detail-elev',icon:'⛰️', title:'Höhenprofil erscheint',           sub:'Canvas-Chart',
+      tap:'Im Detail-Panel nach unten scrollen',
+      expect:'<b>Teal-Gradient-Chart</b> mit Höhenlinie. Meter-Labels links/rechts, km unten. 4 Stat-Boxen darunter.',
+      note:'Nur bei PRs mit GPX-Höhendaten. Teste mit PR 1, PR 3.1, PR 6.3, PR 9.1, PR 10.' },
+    { id:'detail-links',icon:'🔗', title:'Plattform-Logos korrekt',        sub:'8 Icon-Buttons',
+      tap:'"Links & Dienste" im Detail ansehen',
+      expect:'<b>Echte SVG-Logos</b>: Madeira.pt (grün M), Instagram (Gradient), Maps (Pin), Anfahrt (Auto), YouTube, Komoot, Strava, Google.' },
+    { id:'detail-status',icon:'🚦', title:'Status setzen',                 sub:'4 Buttons',
+      tap:'Status-Button "Eingeschränkt" antippen',
+      expect:'Button hat helleren Rahmen. <b>Status-Dot am Pin</b> wechselt sofort auf gelb. Bei "Kein Interesse": Pin verschwindet.' },
+    { id:'detail-fav', icon:'⭐', title:'Favoriten',                       sub:'Favoriten-Button',
+      tap:'"♡ Zu Favoriten" antippen',
+      expect:'Button zeigt "★ Aus Favoriten". Pin bekommt gelben Stern.' },
+    { id:'detail-ics', icon:'📅', title:'ICS-Export',                      sub:'Kalender-Event',
+      tap:'"Als Kalender-Event (.ics)" antippen',
+      expect:'Download startet (PR-1.ics). Toast "Kalender-Event exportiert".' },
+    { id:'detail-close',icon:'✕', title:'Detail schließen',               sub:'× oben rechts',
+      tap:'× Button im Detail-Panel',
+      expect:'Panel schließt. Glow am Pin erlischt.' },
+  ]},
+  { cat:'Filter', steps:[
+    { id:'flt-open',   icon:'🔽', title:'Filter öffnen',                  sub:'Trichter-FAB unten rechts',
+      tap:'Kleinen Trichter-Button unten rechts antippen',
+      expect:'<b>Filter-Sheet</b> öffnet. Regions-Chips, Status-Chips, 4 Dual-Slider sichtbar.' },
+    { id:'flt-region', icon:'🗾', title:'Regions-Filter',                 sub:'Chip auswählen',
+      tap:'"Zentrales Hochgebirge" Chip antippen',
+      expect:'Chip wird teal-aktiv. Nur PRs dieser Region sichtbar. <b>Slider passen Min/Max automatisch an.</b>' },
+    { id:'flt-slider', icon:'📏', title:'Dual-Slider Track-Länge',        sub:'Zwei Anfasser',
+      tap:'Linken Anfasser des "Track-Länge" Sliders nach rechts ziehen',
+      expect:'Linker Wert steigt live. Karte zeigt sofort weniger Pins. <b>Anfasser lassen sich nicht aneinander vorbeiziehen.</b>' },
+    { id:'flt-drive',  icon:'🚗', title:'Dual-Slider Anfahrt km',         sub:'Rechten Anfasser',
+      tap:'Rechten Anfasser des "Anfahrt" Sliders nach links ziehen',
+      expect:'Maximale Anfahrtstrecke sinkt. Lange Anfahrten verschwinden von der Karte.' },
+    { id:'flt-status', icon:'🟢', title:'Status-Chip Filter',             sub:'Chip mit Dot + Label',
+      tap:'"Offen" Status-Chip antippen',
+      expect:'Chip leuchtet grün. Nur offene PRs sichtbar.' },
+    { id:'flt-reset',  icon:'↺', title:'Filter zurücksetzen',             sub:'Reset-Button',
+      tap:'"Filter zurücksetzen" antippen',
+      expect:'Alle Chips deaktiviert, Slider auf Maximum. Alle PRs wieder sichtbar.' },
+  ]},
+  { cat:'Tabs & Panels', steps:[
+    { id:'tab-journal',icon:'📖', title:'Journal Tab',                    sub:'PR-Liste',
+      tap:'"Journal" in der Fußleiste antippen',
+      expect:'Panel mit PR-Karten. Suchfeld oben. Jede Karte: Tag, Name, Region, km, Status-Pill.' },
+    { id:'tab-search', icon:'🔍', title:'Suche im Journal',               sub:'Suchfeld',
+      tap:'Suchfeld antippen → "Levada" eingeben',
+      expect:'Liste filtert live. Karte aktualisiert sich ebenfalls.' },
+    { id:'tab-overview',icon:'🏠', title:'Übersicht Tab',                 sub:'Stats + Banner',
+      tap:'"Übersicht" antippen',
+      expect:'3 Stat-Boxen (teal). Wenn Reisezeitraum gesetzt: Travel-Banner mit Countdown.' },
+    { id:'tab-trips',  icon:'✈️', title:'Reisen Tab',                     sub:'Favoriten-Liste',
+      tap:'"Reisen" antippen',
+      expect:'Travel-Banner + Favoriten-Liste. Vorher mind. 1 PR als Favorit setzen.' },
+    { id:'tab-options',icon:'⚙️', title:'Optionen Tab',                   sub:'Kartenstil + Ebenen',
+      tap:'"Optionen" antippen → "☀️ OSM hell" antippen',
+      expect:'Karte wechselt auf helle OSM-Karte. Button teal-aktiv markiert.' },
+    { id:'tab-concelhos',icon:'🌐', title:'Concelhos-Grenzen',            sub:'Layer-Toggle',
+      tap:'Optionen → Concelhos-Toggle an → Karte ansehen',
+      expect:'Gestrichelte Teal-Linien zeigen Gemeindegrenzen. Fläche antippen → Toast + Zoom.' },
+  ]},
+  { cat:'Einstellungen', steps:[
+    { id:'set-open',   icon:'⚙️', title:'Einstellungen öffnen',           sub:'Zahnrad in der oberen Pill',
+      tap:'Obere rechte Pill → Zahnrad antippen',
+      expect:'Einstellungs-Panel von unten. Sektionen: Zeitraum, Linien, Pin, Ebenen.' },
+    { id:'set-date',   icon:'📅', title:'Reisezeitraum setzen',           sub:'Kalender-Picker',
+      tap:'Einstellungen → "Zeitraum" → zwei Daten auswählen → Sichern',
+      expect:'Dunkler Kalender. <b>Blauer Bereich</b> markiert den Zeitraum. Nach Sichern: Travel-Banner in Übersicht.' },
+    { id:'set-ics',    icon:'📆', title:'Reisezeitraum ICS',              sub:'Im Kalender-Sheet',
+      tap:'Kalender-Sheet → "Reisezeitraum als .ics exportieren"',
+      expect:'Download "Madeira-Urlaub.ics" startet.' },
+    { id:'set-color',  icon:'🎨', title:'GPX Linienfarbe',                sub:'Farbpicker',
+      tap:'Einstellungen → "GPX Wanderweg" → andere Farbe wählen → Sichern',
+      expect:'GPX-Linien auf der Karte ändern die Farbe sofort.' },
+    { id:'set-slider', icon:'🎚️', title:'RGB-Regler',                    sub:'"Regler" Tab im Farbpicker',
+      tap:'Farbpicker → "Regler" Tab → Rot-Slider verschieben',
+      expect:'Farbe ändert sich live. Hex-Wert aktualisiert sich automatisch.' },
+    { id:'set-shape',  icon:'🔷', title:'Pin-Form ändern',                sub:'Formauswahl',
+      tap:'Einstellungen → "Pin Form" → ⚪ Kreis antippen',
+      expect:'Pins auf der Karte wechseln zu runder Form.' },
+  ]},
+];
+
+/* ── Test State ── */
+let _testResults = JSON.parse(localStorage.getItem('prTestResults') || '{}');
+let _testActive = null;
+
+function saveTestResults() {
+  localStorage.setItem('prTestResults', JSON.stringify(_testResults));
+  _updateTestBadge();
+}
+
+function _updateTestBadge() {
+  const badge = qs('#testBadge');
+  if(!badge) return;
+  const anyFail = TEST_STEPS.flatMap(c=>c.steps).some(s=>_testResults[s.id]==='fail');
+  badge.style.display = anyFail ? 'block' : 'none';
+}
+
+function renderTestTab() {
+  const el = qs('#panelContent'); if(!el) return;
+
+  // Count stats
+  const allSteps = TEST_STEPS.flatMap(c=>c.steps);
+  const total = allSteps.length;
+  const done  = allSteps.filter(s=>_testResults[s.id]).length;
+  const pass  = allSteps.filter(s=>_testResults[s.id]==='pass').length;
+  const fail  = allSteps.filter(s=>_testResults[s.id]==='fail').length;
+  const skip  = allSteps.filter(s=>_testResults[s.id]==='skip').length;
+  const pct   = Math.round(done/total*100);
+
+  let h = `<div class="test-wrap">
+    <div class="test-header">
+      <h2>Funktionstest V1.9</h2>
+      <p>${done} von ${total} geprüft · ${pct}%</p>
+      <div class="test-progress"><div class="test-progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  let stepNum = 0;
+  TEST_STEPS.forEach(cat => {
+    h += `<div class="test-section-title">${cat.cat}</div>`;
+    cat.steps.forEach(step => {
+      stepNum++;
+      const r = _testResults[step.id];
+      const isActive = _testActive === step.id;
+      const cls = isActive ? 'tc-active' : (r ? `tc-${r}` : '');
+      const numTxt = r==='pass'?'✓':r==='fail'?'✗':r==='skip'?'—':stepNum;
+
+      h += `<div class="test-card ${cls}" id="tc-${step.id}">
+        <div class="test-card-head" onclick="tcToggle('${step.id}')">
+          <div class="tc-num">${numTxt}</div>
+          <div class="tc-title"><b>${step.title}</b><span>${step.sub}</span></div>
+          <div class="tc-icon">${step.icon}</div>
+        </div>
+        <div class="test-card-body">
+          <div class="tap-box">
+            <div class="tap-lbl">👆 Tippe jetzt</div>
+            <div class="tap-action">${step.tap}</div>
+            <div class="tap-expect">📋 Erwartet: ${step.expect}</div>
+            ${step.note?`<div class="tap-note">ℹ️ ${step.note}</div>`:''}
+          </div>
+          <div class="tc-note-label">Notiz (optional)</div>
+          <textarea class="tc-note" id="tcn-${step.id}" placeholder="Was ist aufgefallen?"
+            onclick="event.stopPropagation()">${_testResults['note_'+step.id]||''}</textarea>
+          <div class="tc-btns">
+            <button class="tc-btn tc-pass-btn" onclick="tcResult('${step.id}','pass');event.stopPropagation()">✓ Funktioniert</button>
+            <button class="tc-btn tc-fail-btn" onclick="tcResult('${step.id}','fail');event.stopPropagation()">✗ Fehler</button>
+            <button class="tc-btn tc-skip-btn" onclick="tcResult('${step.id}','skip');event.stopPropagation()">—</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+
+  // Summary if all done
+  if(done === total) {
+    const failList = allSteps.filter(s=>_testResults[s.id]==='fail');
+    h += `<div class="test-summary">
+      <h3>Test abgeschlossen ✓</h3>
+      <div class="ts-grid">
+        <div class="ts-stat ts-pass"><b>${pass}</b><small>Bestanden</small></div>
+        <div class="ts-stat ts-fail"><b>${fail}</b><small>Fehler</small></div>
+        <div class="ts-stat ts-skip"><b>${skip}</b><small>Übersprungen</small></div>
+      </div>
+      ${failList.length?'<div>'+failList.map(s=>`<div class="ts-fail-item">✗ ${s.icon} ${s.title}</div>`).join('')+'</div>':''}
+      <button class="ts-reset" onclick="tcReset()">↺ Test zurücksetzen</button>
+    </div>`;
+  }
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+function tcToggle(id) {
+  // Save note if switching away
+  if(_testActive && _testActive !== id) {
+    const noteEl = qs(`#tcn-${_testActive}`);
+    if(noteEl) _testResults[`note_${_testActive}`] = noteEl.value;
+  }
+  _testActive = _testActive === id ? null : id;
+  renderTestTab();
+  if(_testActive) {
+    setTimeout(()=>{
+      const el = qs(`#tc-${_testActive}`);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 60);
+  }
+}
+
+function tcResult(id, result) {
+  const noteEl = qs(`#tcn-${id}`);
+  if(noteEl) _testResults[`note_${id}`] = noteEl.value;
+  _testResults[id] = result;
+  saveTestResults();
+  // Auto-advance to next unanswered
+  const allSteps = TEST_STEPS.flatMap(c=>c.steps);
+  let found = false, nextId = null;
+  for(const s of allSteps) {
+    if(found && !_testResults[s.id]) { nextId = s.id; break; }
+    if(s.id === id) found = true;
+  }
+  _testActive = nextId;
+  renderTestTab();
+  if(nextId) {
+    setTimeout(()=>{
+      const el = qs(`#tc-${nextId}`);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 80);
+  }
+}
+
+function tcReset() {
+  if(!confirm('Test komplett zurücksetzen?')) return;
+  TEST_STEPS.flatMap(c=>c.steps).forEach(s=>{
+    delete _testResults[s.id];
+    delete _testResults[`note_${s.id}`];
+  });
+  _testActive = null;
+  saveTestResults();
+  renderTestTab();
+}
+
+/* Hook into setTab */
+const _origSetTab = window.setTab;
+window.setTab = function(tab) {
+  if(tab === 'test') {
+    S.tab = 'test';
+    qsa('#bottomNav button').forEach(b=>b.classList.toggle('active', b.dataset.tab==='test'));
+    qs('#panel').classList.remove('hidden');
+    qs('#hero').classList.add('hide');
+    qs('.filter-fab')?.classList.add('hidden');
+    S.panel = true;
+    // Auto-open first unanswered
+    if(!_testActive) {
+      const allSteps = TEST_STEPS.flatMap(c=>c.steps);
+      const first = allSteps.find(s=>!_testResults[s.id]);
+      if(first) _testActive = first.id;
+    }
+    renderTestTab();
+    setTimeout(()=>map.invalidateSize(), 200);
+    if(_testActive) {
+      setTimeout(()=>{
+        const el = qs(`#tc-${_testActive}`);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 300);
+    }
+  } else {
+    _origSetTab(tab);
+  }
+};
+
+Object.assign(window, { tcToggle, tcResult, tcReset, renderTestTab });
+_updateTestBadge();

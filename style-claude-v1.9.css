@@ -565,3 +565,79 @@ svg { display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-line
 .filter-section { margin-bottom:20px }
 .filter-section-title { font-size:11px; font-weight:700; text-transform:uppercase;
   letter-spacing:.12em; color:var(--muted); margin-bottom:12px }
+
+/* ══ TEST TAB ════════════════════════════════════════════ */
+.test-wrap { padding-bottom: 8px }
+.test-header { margin-bottom: 16px }
+.test-header h2 { font-size: 20px; font-weight: 800; color: var(--text) }
+.test-header p { font-size: 12px; color: var(--muted); margin-top: 4px }
+.test-progress { height: 4px; background: rgba(90,200,250,.1); border-radius: 99px; margin-top: 10px; overflow: hidden }
+.test-progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--green)); border-radius: 99px; transition: width .4s ease }
+
+.test-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+  font-weight: 700; color: var(--muted); margin: 20px 0 8px; padding-left: 2px }
+
+.test-card { border-radius: 18px; background: var(--surf-tint); border: 1px solid var(--border-sub);
+  margin-bottom: 8px; overflow: hidden; transition: border-color .2s }
+.test-card.tc-pass { border-color: var(--green) }
+.test-card.tc-fail { border-color: var(--red) }
+.test-card.tc-skip { border-color: rgba(255,255,255,.08); opacity: .55 }
+.test-card.tc-active { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(90,200,250,.12) }
+
+.test-card-head { padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer }
+.tc-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(90,200,250,.1);
+  border: 1px solid var(--border); display: grid; place-items: center;
+  font-size: 11px; font-weight: 800; color: var(--teal); flex: 0 0 28px }
+.test-card.tc-pass .tc-num { background: var(--green); border-color: var(--green); color: white }
+.test-card.tc-fail .tc-num { background: var(--red); border-color: var(--red); color: white }
+.test-card.tc-skip .tc-num { background: rgba(255,255,255,.06); color: var(--muted) }
+.tc-title { flex: 1 }
+.tc-title b { display: block; font-size: 13px; font-weight: 700; color: var(--text) }
+.tc-title span { font-size: 11px; color: var(--muted) }
+.tc-icon { font-size: 20px }
+
+.test-card-body { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border-sub) }
+.test-card.tc-active .test-card-body { display: block }
+
+.tap-box { margin: 12px 0 10px; border-radius: 14px;
+  background: rgba(90,200,250,.05); border: 1px solid rgba(90,200,250,.15); padding: 11px 13px }
+.tap-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
+  font-weight: 700; color: var(--teal); margin-bottom: 5px }
+.tap-action { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.5 }
+.tap-expect { margin-top: 7px; font-size: 12px; color: var(--muted); line-height: 1.5 }
+.tap-expect b { color: rgba(240,250,248,.8) }
+.tap-note { margin-top: 6px; font-size: 11px; color: rgba(90,200,250,.55); line-height: 1.4 }
+
+.tc-note-label { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 5px }
+.tc-note { width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--border-sub);
+  border-radius: 12px; padding: 9px 12px; font-size: 13px; color: var(--text);
+  resize: none; min-height: 54px; font-family: inherit; margin-bottom: 10px }
+.tc-note::placeholder { color: var(--muted) }
+
+.tc-btns { display: flex; gap: 7px }
+.tc-btn { flex: 1; height: 44px; border-radius: 13px; font-size: 13px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; gap: 5px; transition: .14s }
+.tc-btn:active { transform: scale(.94) }
+.tc-pass-btn { background: rgba(52,199,89,.12); border: 1.5px solid rgba(52,199,89,.35); color: var(--green) }
+.tc-fail-btn { background: rgba(255,59,48,.08); border: 1.5px solid rgba(255,59,48,.28); color: var(--red) }
+.tc-skip-btn { background: rgba(255,255,255,.05); border: 1.5px solid rgba(255,255,255,.1);
+  color: var(--muted); flex: 0 0 64px }
+
+/* Summary */
+.test-summary { border-radius: 18px; background: var(--surf-tint); border: 1px solid var(--border-sub);
+  padding: 16px; margin-top: 16px }
+.test-summary h3 { font-size: 16px; font-weight: 800; margin-bottom: 12px }
+.ts-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-bottom: 12px }
+.ts-stat { border-radius: 13px; padding: 10px; text-align: center }
+.ts-pass { background: rgba(52,199,89,.1); border: 1px solid rgba(52,199,89,.2) }
+.ts-fail { background: rgba(255,59,48,.08); border: 1px solid rgba(255,59,48,.2) }
+.ts-skip { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08) }
+.ts-stat b { display: block; font-size: 22px; font-weight: 900 }
+.ts-pass b { color: var(--green) } .ts-fail b { color: var(--red) } .ts-skip b { color: var(--muted) }
+.ts-stat small { font-size: 10px; color: var(--muted) }
+.ts-fail-item { font-size: 12px; color: rgba(255,80,70,.8); padding: 4px 0;
+  border-bottom: 1px solid var(--border-sub) }
+.ts-fail-item:last-child { border: none }
+.ts-reset { width: 100%; height: 42px; border-radius: 13px; margin-top: 10px;
+  background: rgba(90,200,250,.07); border: 1px solid var(--border); color: var(--teal);
+  font-size: 14px; font-weight: 700 }
